@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:mynotes/firebase_options.dart';
+import 'dart:developer' as devtool show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -16,7 +15,6 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
@@ -24,7 +22,6 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _email.dispose();
     _password.dispose();
     super.dispose();
@@ -58,15 +55,18 @@ class _LoginViewState extends State<LoginView> {
               try {
                 final email = _email.text;
                 final password = _password.text;
-                final userCredential = await FirebaseAuth.instance
+                await FirebaseAuth.instance
                     .signInWithEmailAndPassword(
                         email: email, password: password);
-                print(userCredential);
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  "/notes/",
+                  (route) => false,
+                );
               } on FirebaseAuthException catch (e) {
                 if (e.code == "invalid-credential") {
-                  print("invalid credential");
+                  devtool.log("invalid credential");
                 } else {
-                  print(e.code);
+                  devtool.log(e.code);
                 }
               }
             },
