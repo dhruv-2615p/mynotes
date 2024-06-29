@@ -9,13 +9,18 @@ class NotesService {
   Database? _db;
 
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      },
+    );
+  }
   factory NotesService() => _shared;
 
   List<DatabaseNote> _notes = [];
 
-  final _notesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
 
@@ -83,7 +88,7 @@ class NotesService {
     final result = await db.query(
       userTable,
       limit: 1,
-      where: 'email = ?',                   // if error coming then make email to $emailColumn
+      where: 'email = ?', // if error coming then make email to $emailColumn
       whereArgs: [email.toLowerCase()],
     );
 
@@ -212,9 +217,13 @@ class NotesService {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
-    // ensureing that note should exists
-    await getNote(id: note.id);
-
+    try {
+      // ensureing that note should exists
+      await getNote(id: note.id);
+    } on CouldNotFindNote {
+      // empty
+      rethrow;
+    }
     final updateCount = db.update(noteTable, {
       textColumn: text,
       isSyncedWithCloudColumn: 0,
