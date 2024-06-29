@@ -70,7 +70,7 @@ class NotesService {
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
-      where: 'email: ?',
+      where: 'email = ?',
       whereArgs: [email.toLowerCase()],
     );
 
@@ -83,7 +83,7 @@ class NotesService {
     final result = await db.query(
       userTable,
       limit: 1,
-      where: 'email: ?',
+      where: 'email = ?',                   // if error coming then make email to $emailColumn
       whereArgs: [email.toLowerCase()],
     );
 
@@ -107,7 +107,7 @@ class NotesService {
     final results = await db.query(
       userTable,
       limit: 1,
-      where: 'email= ?',
+      where: 'email = ?',
       whereArgs: [email.toLowerCase()],
     );
 

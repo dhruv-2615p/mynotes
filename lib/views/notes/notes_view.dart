@@ -31,9 +31,10 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notes"),
+        title: const Text("All Notes"),
         backgroundColor: Colors.blue,
         actions: [
+          // IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
@@ -86,6 +87,13 @@ class _NotesViewState extends State<NotesView> {
           }
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(newNoteRoute);
+        },
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: const CustomFloatingActionButtonLocation(),
     );
   }
 }
@@ -113,4 +121,18 @@ Future<bool> showLogOutDialog(BuildContext context) {
           ],
         );
       }).then((value) => value ?? false);
+}
+
+class CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
+  const CustomFloatingActionButtonLocation();
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    // Customize the position here
+    return Offset(
+      scaffoldGeometry.scaffoldSize.width - 90.0, // + left
+      scaffoldGeometry.scaffoldSize.height -
+          112.0, // Adjust this value to move up or down + up
+    );
+  }
 }
