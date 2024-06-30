@@ -187,7 +187,7 @@ class NotesService {
     final notes = await db.query(
       noteTable,
       limit: 1,
-      where: 'id = ?',
+      where: '$idColumn = ?',
       whereArgs: [id],
     );
 
@@ -217,17 +217,17 @@ class NotesService {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
-    try {
-      // ensureing that note should exists
-      await getNote(id: note.id);
-    } on CouldNotFindNote {
-      // empty
-      rethrow;
-    }
-    final updateCount = db.update(noteTable, {
-      textColumn: text,
-      isSyncedWithCloudColumn: 0,
-    });
+    await getNote(id: note.id);
+
+    final updateCount = await db.update(
+      noteTable,
+      {
+        textColumn: text,
+        isSyncedWithCloudColumn: 0,
+      },
+      where: '$idColumn = ?',
+      whereArgs: [note.id],
+    );
 
     if (updateCount == 0) {
       throw CouldNotUpdateNote();
