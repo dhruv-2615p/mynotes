@@ -91,6 +91,15 @@ void main() {
       final user = provider.currentUser;
       expect(user, isNotNull);
     });
+
+    test('Should reload user data', () async {
+      await provider.createUser(
+          email: 'test@example.com', password: 'password');
+      await provider.reloadUser();
+      final user = provider.currentUser;
+      expect(user, isNotNull);
+      expect(user?.isEmailVerified, true); // Assuming user is verified after reload
+    });
   });
 }
 
@@ -135,7 +144,11 @@ class MockAuthProvider implements AuthProvider {
 
     if (password == "Dhruv") throw WrongPasswordAuthException();
 
-    const user = AuthUser(isEmailVerified: false, email: 'dhrupx@gmail.com');
+    const user = AuthUser(
+      isEmailVerified: false,
+      email: 'dhrupx@gmail.com',
+      id: 'my_id',
+    );
     _user = user;
 
     return Future.value(user);
@@ -156,7 +169,23 @@ class MockAuthProvider implements AuthProvider {
     final user = _user;
     if (user == null) throw UserNotFoundAuthException();
 
-    const newUser = AuthUser(isEmailVerified: true, email: 'xyzd@gmail.com');
+    const newUser =
+        AuthUser(isEmailVerified: true, email: 'xyzd@gmail.com', id: 'my_id');
     _user = newUser;
+  }
+  
+  @override
+  Future<void> reloadUser() async {
+    if (!isInitialized) throw NotInitializedException();
+    // Simulate reloading user data
+    if (_user != null) {
+      _user = AuthUser(
+        isEmailVerified: true, // Assume the user has been verified for the test
+        email: _user!.email,
+        id: _user!.id,
+      );
+    } else {
+      throw UserNotLoggedInAuthException();
+    }
   }
 }

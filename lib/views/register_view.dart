@@ -68,7 +68,7 @@ class _RegisterViewState extends State<RegisterView> {
               } on WeakPasswordAuthException {
                 await showErrorDialog(
                   context,
-                  "Your password is too weak.\nPlease try again.",
+                  "Your password is too weak.\nMake it strong.",
                 );
               } on EmailAlreadyInUseAuthException {
                 await showErrorDialog(
