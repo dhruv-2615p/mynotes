@@ -85,6 +85,11 @@ class _LoginViewState extends State<LoginView> {
                   context,
                   "Your password is incorrect.\nPlease try again.",
                 );
+              } on InvalidEmailAuthException {
+                await showErrorDialog(
+                  context,
+                  "Invalid credential.Please try again.",
+                );
               } on ChannelErrorAuthException {
                 await showErrorDialog(
                   context,

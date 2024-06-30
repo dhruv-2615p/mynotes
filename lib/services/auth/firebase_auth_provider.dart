@@ -111,4 +111,14 @@ class FirebaseAuthProvider implements AuthProvider {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
+
+  @override
+  Future<void> reloadUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.reload();
+    } else {
+      throw UserNotLoggedInAuthException();
+    }
+  }
 }

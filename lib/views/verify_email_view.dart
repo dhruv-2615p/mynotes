@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mynotes/constants/routes.dart';
 import 'package:mynotes/services/auth/auth_service.dart';
@@ -10,6 +12,34 @@ class VerifyEmailView extends StatefulWidget {
 }
 
 class _VerifyEmailViewState extends State<VerifyEmailView> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    _startEmailVerificationCheck();
+    super.initState();
+  }
+
+  void _startEmailVerificationCheck() {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      await AuthService.firebase().reloadUser();
+      final user = AuthService.firebase().currentUser;
+      if (user?.isEmailVerified ?? false) {
+        _timer?.cancel();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          loginRoute,
+          (route) => false,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

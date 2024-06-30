@@ -18,4 +18,6 @@ abstract class AuthProvider {
   Future<void> logOut();
 
   Future<void> sendEmailVerification();
+
+  Future<void> reloadUser(); // Add this line
 }
