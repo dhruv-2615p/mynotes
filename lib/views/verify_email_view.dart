@@ -1,8 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:mynotes/constants/routes.dart';
-import 'package:mynotes/services/auth/auth_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mynotes/services/auth/bloc/auth_bloc.dart';
+import 'package:mynotes/services/auth/bloc/auth_event.dart';
+import 'package:mynotes/services/auth/bloc/auth_state.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -21,16 +22,8 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   }
 
   void _startEmailVerificationCheck() {
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
-      await AuthService.firebase().reloadUser();
-      final user = AuthService.firebase().currentUser;
-      if (user?.isEmailVerified ?? false) {
-        _timer?.cancel();
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          loginRoute,
-          (route) => false,
-        );
-      }
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      context.read<AuthBloc>().add(const AuthEventInitialize());
     });
   }
 
@@ -42,34 +35,44 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Email verification"),
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            const Text(
-                "Email already sended to verify.\nPlease check you mail."),
-            const Text("If you did not get mail, press this button."),
-            TextButton(
-              onPressed: () async {
-                await AuthService.firebase().sendEmailVerification();
-              },
-              child: const Text("Send email again"),
-            ),
-            TextButton(
-              onPressed: () async {
-                await AuthService.firebase().logOut();
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  registerRoute,
-                  (route) => false,
-                );
-              },
-              child: const Text('Restart'),
-            )
-          ],
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthStateLoggedIn && state.user.isEmailVerified) {
+          _timer?.cancel();
+          context.read<AuthBloc>().add(
+                const AuthEventLogOut(),
+              );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Email verification"),
+          backgroundColor: Colors.blue,
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              const Text(
+                  "Email already sended to verify.\nPlease check you mail."),
+              const Text("If you did not get mail, press this button."),
+              TextButton(
+                onPressed: () {
+                  context.read<AuthBloc>().add(
+                        const AuthEventSendEmailVerification(),
+                      );
+                },
+                child: const Text("Send email again"),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.read<AuthBloc>().add(
+                        const AuthEventLogOut(),
+                      );
+                },
+                child: const Text('Restart'),
+              )
+            ],
+          ),
         ),
       ),
     );
