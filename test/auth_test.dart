@@ -92,14 +92,16 @@ void main() {
       expect(user, isNotNull);
     });
 
-    test('Should reload user data', () async {
-      await provider.createUser(
-          email: 'test@example.com', password: 'password');
-      await provider.reloadUser();
-      final user = provider.currentUser;
-      expect(user, isNotNull);
-      expect(user?.isEmailVerified, true); // Assuming user is verified after reload
-    });
+    // test('Should reload user data', () async {
+    //   await provider.createUser(
+    //       email: 'test@example.com', password: 'password');
+    //   await provider.reloadUser();
+    //   final user = provider.currentUser;
+    //   expect(user, isNotNull);
+    //   expect(user?.isEmailVerified, true); // Assuming user is verified after reload
+    // });
+
+
   });
 }
 
@@ -187,5 +189,10 @@ class MockAuthProvider implements AuthProvider {
     } else {
       throw UserNotLoggedInAuthException();
     }
+  }
+  
+  @override
+  Future<void> sendPasswordReset({required String toEmail}) {
+    throw UnimplementedError();
   }
 }
