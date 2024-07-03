@@ -17,7 +17,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
-      title: 'Flutter Demo',
+      title: 'My Notes',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
@@ -32,7 +32,7 @@ void main() {
   );
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatelessWidget { 
   const HomePage({super.key});
 
   @override
