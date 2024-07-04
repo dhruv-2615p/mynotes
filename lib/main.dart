@@ -18,6 +18,7 @@ void main() {
   runApp(
     MaterialApp(
       title: 'My Notes',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
